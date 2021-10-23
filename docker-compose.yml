@@ -1,0 +1,65 @@
+version: "3.8"
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: gunicorn blogs.wsgi:application --bind 0.0.0.0:8000
+    restart: always
+    depends_on:
+      - db
+    volumes:
+      - ./:/usr/src/app/
+    env_file:
+      - ./.env.dev
+
+  web2:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: gunicorn blogs.wsgi:application --bind 0.0.0.0:8000
+    restart: always
+    depends_on:
+      - db
+    volumes:
+      - ./:/usr/src/app/
+    env_file:
+      - ./.env.dev
+
+  web3:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: gunicorn blogs.wsgi:application --bind 0.0.0.0:8000
+    restart: always
+    depends_on:
+      - db
+    volumes:
+      - ./:/usr/src/app/
+    env_file:
+      - ./.env.dev
+
+  db:
+    image: postgres:13.0-alpine
+    restart: always
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_USER=blog_user
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=blogs
+  nginx:
+    build: ./nginx
+    volumes:
+      - static_volume:/home/app/web/staticfiles
+    ports:
+      - 80:80
+    depends_on:
+      - web
+      - web2
+      - web3
+
+volumes:
+  postgres_data:
+  static_volume:
